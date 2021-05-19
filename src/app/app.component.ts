@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ElectronService } from './core/services';
+import { DatabaseService, ElectronService } from './core/services';
 import { TranslateService } from '@ngx-translate/core';
 import { AppConfig } from '../environments/environment';
 
@@ -11,7 +11,8 @@ import { AppConfig } from '../environments/environment';
 export class AppComponent {
   constructor(
     private electronService: ElectronService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    public dataService: DatabaseService
   ) {
     this.translate.setDefaultLang('en');
     console.log('AppConfig', AppConfig);
