@@ -32,6 +32,10 @@ With this sample, you can:
 
 /!\ Angular 11.x CLI needs Node 10.13 or later to work correctly.
 
+# Note
+
+The [angular-ngrx-material-starter](https://github.com/tomastrajan/angular-ngrx-material-starter) template is added in this project for better examples on using ngrx and angular material.
+
 ## Getting Started
 
 Clone this repository locally:

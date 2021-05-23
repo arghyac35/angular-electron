@@ -1,27 +1,53 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { PageNotFoundComponent } from './shared/components';
-
-import { HomeRoutingModule } from './home/home-routing.module';
-import { DetailRoutingModule } from './detail/detail-routing.module';
+import { Routes, RouterModule, PreloadAllModules } from '@angular/router';
 
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'about',
     pathMatch: 'full'
   },
   {
+    path: 'about',
+    loadChildren: () =>
+      import('./features/about/about.module').then((m) => m.AboutModule)
+  },
+  {
+    path: 'feature-list',
+    loadChildren: () =>
+      import('./features/feature-list/feature-list.module').then(
+        (m) => m.FeatureListModule
+      )
+  },
+  {
+    path: 'settings',
+    loadChildren: () =>
+      import('./features/settings/settings.module').then(
+        (m) => m.SettingsModule
+      )
+  },
+  {
+    path: 'examples',
+    loadChildren: () =>
+      import('./features/examples/examples.module').then(
+        (m) => m.ExamplesModule
+      )
+  },
+  {
     path: '**',
-    component: PageNotFoundComponent
+    redirectTo: 'about'
   }
 ];
 
 @NgModule({
+  // useHash supports github.io demo page, remove in your app
   imports: [
-    RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
-    HomeRoutingModule,
-    DetailRoutingModule
+    RouterModule.forRoot(routes, {
+      useHash: true,
+      scrollPositionRestoration: 'enabled',
+      preloadingStrategy: PreloadAllModules,
+      relativeLinkResolution: 'legacy'
+    })
   ],
   exports: [RouterModule]
 })

@@ -77,5 +77,11 @@
         "@angular-eslint/template/no-negated-async": "error"
       }
     }
+  ],
+  "plugins": [
+    "ngrx"
+  ],
+  "extends": [
+    "plugin:ngrx/recommended"
   ]
 }

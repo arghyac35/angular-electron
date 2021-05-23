@@ -1,29 +1,87 @@
-import { Component } from '@angular/core';
-import { DatabaseService, ElectronService } from './core/services';
-import { TranslateService } from '@ngx-translate/core';
+import browser from 'browser-detect';
+import { Component, OnInit } from '@angular/core';
+import { Store, select } from '@ngrx/store';
+import { Observable } from 'rxjs';
+
 import { AppConfig } from '../environments/environment';
+
+import {
+  authLogin,
+  authLogout,
+  routeAnimations,
+  LocalStorageService,
+  selectIsAuthenticated,
+  selectSettingsStickyHeader,
+  selectSettingsLanguage,
+  selectEffectiveTheme
+} from './core/core.module';
+import {
+  actionSettingsChangeAnimationsPageDisabled,
+  actionSettingsChangeLanguage
+} from './core/settings/settings.actions';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
+  animations: [routeAnimations]
 })
-export class AppComponent {
-  constructor(
-    private electronService: ElectronService,
-    private translate: TranslateService,
-    public dataService: DatabaseService
-  ) {
-    this.translate.setDefaultLang('en');
-    console.log('AppConfig', AppConfig);
+export class AppComponent implements OnInit {
+  isProd = AppConfig.production;
+  envName = AppConfig.environment;
+  version = AppConfig.versions.app;
+  year = new Date().getFullYear();
+  logo = 'assets/logo.png';
+  languages = ['en', 'de', 'sk', 'fr', 'es', 'pt-br', 'zh-cn', 'he'];
+  navigation = [
+    { link: 'about', label: 'anms.menu.about' },
+    { link: 'feature-list', label: 'anms.menu.features' },
+    { link: 'examples', label: 'anms.menu.examples' }
+  ];
+  navigationSideMenu = [
+    ...this.navigation,
+    { link: 'settings', label: 'anms.menu.settings' }
+  ];
 
-    if (electronService.isElectron) {
-      console.log(process.env);
-      console.log('Run in electron');
-      console.log('Electron ipcRenderer', this.electronService.ipcRenderer);
-      console.log('NodeJS childProcess', this.electronService.childProcess);
-    } else {
-      console.log('Run in browser');
+  isAuthenticated$: Observable<boolean>;
+  stickyHeader$: Observable<boolean>;
+  language$: Observable<string>;
+  theme$: Observable<string>;
+
+  constructor(
+    private store: Store,
+    private storageService: LocalStorageService
+  ) { }
+
+  private static isIEorEdgeOrSafari() {
+    return ['ie', 'edge', 'safari'].includes(browser().name);
+  }
+
+  ngOnInit(): void {
+    this.storageService.testLocalStorage();
+    if (AppComponent.isIEorEdgeOrSafari()) {
+      this.store.dispatch(
+        actionSettingsChangeAnimationsPageDisabled({
+          pageAnimationsDisabled: true
+        })
+      );
     }
+
+    this.isAuthenticated$ = this.store.pipe(select(selectIsAuthenticated));
+    this.stickyHeader$ = this.store.pipe(select(selectSettingsStickyHeader));
+    this.language$ = this.store.pipe(select(selectSettingsLanguage));
+    this.theme$ = this.store.pipe(select(selectEffectiveTheme));
+  }
+
+  onLoginClick() {
+    this.store.dispatch(authLogin());
+  }
+
+  onLogoutClick() {
+    this.store.dispatch(authLogout());
+  }
+
+  onLanguageSelect({ value: language }) {
+    this.store.dispatch(actionSettingsChangeLanguage({ language }));
   }
 }
